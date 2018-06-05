@@ -38,20 +38,88 @@
 
         },
         mounted() {
+            const data = {
+                "askList": [{ "price": "8.0000000", "volume": "1.0000000000" },{ "price": "8.5000000", "volume": "1.0000000000" },{ "price": "9.9000000", "volume": "1.0000000000" },{ "price": "10.4000000", "volume": "1.0000000000" }, { "price": "11.8000000", "volume": "1.0000000000" },{ "price": "12.0000000", "volume": "1.0000000000" },{ "price": "16.5000000", "volume": "1.0000000000" }, { "price": "18.0000000", "volume": "1.0000000000" }],
+                "bidList": [{ "price": "7.0000000", "volume": "1.0000000000" },{ "price": "6.0000000", "volume": "1.0000000000" },{ "price": "5.0000000", "volume": "1.0000000000" }, { "price": "4.1000000", "volume": "1.0000000000" }, { "price": "4.0000000", "volume": "1.0000000000" }, { "price": "3.0000000", "volume": "3.0000000000" }, { "price": "2.0000000", "volume": "1.0000000000" }, { "price": "1.0000000", "volume": "1.0000000000" }]
+            };
+            //askList 卖 bidList 买
+            let { askList, bidList } = data;
+
+            let buyPrice=[],
+                sellPrice=[],
+                buyTotal=[],
+                sellTotal=[]
+                ;
+
+            for (const i in bidList) {
+                let total = 0;
+                for (let n = 0; n <= i; n++) {
+                    total += Number(bidList[n].volume);
+                }
+                buyPrice.push(Number(bidList[i].price))
+                buyTotal.push(total);
+            }
+            buyPrice=buyPrice.reverse();
+            buyTotal=buyTotal.reverse();
+
+            for (const i in askList) {
+                let total = 0;
+                for (let n = i; n < askList.length; n++) {
+                    total += Number(askList[n].volume);
+                }
+                sellPrice.push(Number(askList[i].price))
+                sellTotal.push(total);
+            }
+            console.log(buyPrice,sellPrice,buyTotal,sellTotal)
+            let nullList =new Array(buyPrice.length)
+            console.log(nullList)
             // 基于准备好的dom，初始化echarts实例
             const myChart = echarts.init(document.getElementById('chart'));
             // 绘制图表
             myChart.setOption({
+                legend:{
+                    data:['买','卖',],
+                    selectedMode:false,
+                },
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                    data: [...buyPrice,...sellPrice]
                 },
                 yAxis: {
-                    type: 'value'
+                    type: 'value',
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        inside: true,
+                        // formatter: '{value}\n'
+                    },
                 },
                 series: [{
-                    data: [820, 932, 901, 934, 1290, 1330, 1320],
+                    name:'买',
+                    itemStyle: {
+                        normal: {
+                            color: '#8ec6ad'
+                        }
+                    },
+                    data: buyTotal,
+                    symbol:'none',
+                    type: 'line',
+                    areaStyle: {
+                        normal: {
+                            color: '#8ec6ad'
+                        }
+                    },
+                },{
+                    name:'卖',
+                    itemStyle: {
+                        normal: {
+                            color: 'red'
+                        }
+                    },
+                    data: [...nullList,...sellPrice],
+                    symbol:'none',
                     type: 'line',
                     areaStyle: {}
                 }]
